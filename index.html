@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexical Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 1.1em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lexical Analyzer</h1>
+    </header>
+    
+    <main>
+        <div class="container">
+            <form id="lexicalForm">
+                <label for="inputString">Enter code to analyze:</label>
+                <textarea id="inputString" rows="6" placeholder="Write or paste your code here..."></textarea><br>
+                <button type="submit">Analyze</button>
+            </form>
+
+            <h3>Tokens</h3>
+            <pre id="tokens">Your tokens will appear here...</pre>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('lexicalForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const inputString = document.getElementById('inputString').value;
+
+            fetch('http://127.0.0.1:5000/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input: inputString })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.tokens) {
+                    let tokenString = '';
+                    data.tokens.forEach(token => {
+                        tokenString += `(${token[0]}, '${token[1]}')\n`;
+                    });
+                    document.getElementById('tokens').textContent = tokenString;
+                } else if (data.error) {
+                    document.getElementById('tokens').textContent = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => {
+                document.getElementById('tokens').textContent = 'Error: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>
